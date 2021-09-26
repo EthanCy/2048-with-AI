@@ -1,4 +1,5 @@
 #include "client.h"
+#include <fstream>
 
 int Client::isSingleMode() {
 	std::cout << "Select playstyle: (1) AI spectator mode (2) Single-player" << std::endl;
@@ -13,15 +14,18 @@ int Client::isSingleMode() {
 }
 
 void Client::playAI() {
+	int alpha, beta;
+	std::cin >> alpha;
+        std::cin >> beta;	
 	Board board{};
 	board.initializeDisplay(true);
-	BasicAI ai{&board, 4, 100, 10};
+	BasicAI ai{&board, 4, alpha, beta};
 	try {
               ai.play();
         } catch (...) {
               return;
         }
-        std::cout << board << std::endl;
+        //std::cout << board << std::endl;
 }
 
 void Client::playSingle() {
@@ -39,9 +43,16 @@ void Client::playSingle() {
                 } else {
 			std::cout << "Please enter a valid character: w (up), s (down), a (left), d (right)" << std::endl;
 		}
-		std::cout << "NEW HIGHEST TILE: " << board.getScore() << std::endl;
+		//std::cout << "NEW HIGHEST TILE: " << board.getScore() << std::endl;
 	}
 	std::cout << "GAME OVER before destroy board" << std::endl;
+	std::ofstream scoreFile ("aiScore.txt");
+	if (scoreFile.is_open())
+	{
+		scoreFile << board.maxCornerTileSum() << std::endl;
+		scoreFile.close();
+	}
+	else std::cout << "Unable to open file";
 }
 
 void Client::play() {
